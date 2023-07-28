@@ -30,9 +30,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
+      # 레포지토리 체크아웃
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          submodules: recursive
 
       # 한국시간 설정
       - name: TimeZone을 Asia/Seoul로 설정합니다
