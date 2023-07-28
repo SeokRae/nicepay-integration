@@ -20,6 +20,9 @@ on:
 permissions:
   contents: read
 
+defaults:
+  run:
+    working-directory: untact-test-sample
 
 jobs:
   build:
