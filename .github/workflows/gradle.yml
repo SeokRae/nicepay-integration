@@ -11,11 +11,11 @@ on:
   push:
     branches: [ "develop" ]
     paths:
-      - 'untact-test-sample/**'
+      - 'untact-test-sample/'
   pull_request:
     branches: [ "develop" ]
     paths:
-      - 'untact-test-sample/**'
+      - 'untact-test-sample/'
 
 permissions:
   contents: read
