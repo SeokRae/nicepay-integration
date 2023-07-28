@@ -10,8 +10,12 @@ name: Java CI with Gradle
 on:
   push:
     branches: [ "develop" ]
+    paths:
+      - 'untact-test-sample/**'
   pull_request:
     branches: [ "develop" ]
+    paths:
+      - 'untact-test-sample/**'
 
 permissions:
   contents: read
