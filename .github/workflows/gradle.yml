@@ -13,6 +13,11 @@ on:
   pull_request:
     branches: [ "develop" ]
 
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
 defaults:
   run:
     working-directory: untact-test-sample
