@@ -48,7 +48,7 @@ jobs:
 
       # gradle test
       - name: Test with Gradle
-        run: ./gradlew -Dspring.profiles.active=test -d test
+        run: ./gradlew test
 
       # 테스트 후 PR comment 등록
       - name: 테스트 결과를 PR에 코멘트로 등록합니다
