@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    active:
+      - sandbox
+      - urls
+    group:
+      prod:
+        - prod
+      sandbox:
+        - sandbox

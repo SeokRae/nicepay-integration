@@ -1,0 +1,34 @@
+uris:
+  # API Uris
+  access_token: /v1/access-token
+  subscribes:
+    issue: /v1/subscribe/regist
+    payments: /v1/subscribe/{bid}/payments
+    expire: /v1/subscribe/{bid}/expire
+  payments:
+    retrieve_tid: /v1/payments/{tid}
+    retrieve_order_id: /v1/payments/find/{orderId}
+    approve: /v1/payments/{tid}
+    cancel: /v1/payments/{tid}/cancel
+    net_cancel: /v1/payments/netcancel
+  receipts:
+    issue: /v1/receipt
+    retrieve: /v1/receipt/{tid}
+    cancel: /v1/receipt/{tid}/cancel
+  checkout:
+    issue: /v1/checkout
+    retrieve: /v1/checkout/{sessionId}
+    expire: /v1/checkout/{sessionId}/expire
+    cancel: /v1/payments/checkout/{sessionId}/cancel
+    retrieve_payments: /v1/payments/checkout/{sessionId}
+  webhooks:
+    regist: /v1/webhook
+    retrieve: /v1/webhook
+    update: /v1/webhook/{method}/update
+    delete: /v1/webhook/{method}/delete
+  checks:
+    check_amount: /v1/check-amount/{tid}
+  terms:
+    terms: /v1/terms
+    card_event: /v1/card/event
+    card_interest_free: /v1/card/interest-free
