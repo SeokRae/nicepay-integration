@@ -40,10 +40,10 @@ public class WebConfiguration {
     public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
         return restTemplateBuilder
                 .requestFactory(() -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()))
-                // 5초 동안 응답이 없으면 예외 발생
+                // 5초 동안 서버와 연결이 안되면 예외 발생
                 .setConnectTimeout(Duration.ofSeconds(5))
-                // 5초 동안 데이터가 안오면 예외 발생
-                .setReadTimeout(Duration.ofSeconds(5))
+                // 30초 동안 응답이 없으면 예외 발생
+                .setReadTimeout(Duration.ofSeconds(30))
                 .additionalMessageConverters(new MappingJackson2HttpMessageConverter())
                 .additionalInterceptors(new LoggingRequestInterceptor())
                 .build();
