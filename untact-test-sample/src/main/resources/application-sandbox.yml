@@ -1,0 +1,9 @@
+merchant:
+  client_id: S1_client_id
+  secret_key: S1_secret_key
+  return_url: merchant_return_url
+  webhook_url: merchant_webhook_url
+  manager_email: manager_email
+
+domain:
+  api: https://sandbox-api.nicepay.co.kr
