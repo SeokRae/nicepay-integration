@@ -2,9 +2,20 @@ spring:
   profiles:
     active:
       - sandbox
-      - urls
     group:
       prod:
         - prod
+        - urls
       sandbox:
         - sandbox
+        - urls
+
+logging:
+  level:
+    root: INFO
+    kr:
+      co:
+        nicepay:
+          untact:
+            core:
+              interceptor: DEBUG
