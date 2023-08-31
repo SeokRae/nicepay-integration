@@ -38,21 +38,6 @@ public enum PaymentStatus {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid status: " + value));
     }
 
-    public static boolean isMatches(PaymentStatus sourceStatus, PaymentStatus confirmStatus) {
-        return sourceStatus.equals(confirmStatus);
-    }
-
-    public static boolean contains(String status) {
-        return Arrays.stream(values())
-                .filter(method -> StringUtils.isNotBlank(method.getStatus()))
-                .anyMatch(method -> method.getStatus().equals(status));
-    }
-
-    public static boolean containsParam(String status, PaymentStatus... targetStatus) {
-        return Arrays.stream(targetStatus)
-                .anyMatch(method -> method.getStatus().equalsIgnoreCase(status));
-    }
-
     @JsonValue
     public String getStatus() {
         return status;

@@ -60,15 +60,6 @@ public class RestTemplateHelper {
         return restTemplate.exchange(url, HttpMethod.POST, requestEntity, responseType);
     }
 
-    /**
-     * @param url
-     * @param pathVariables
-     * @param header
-     * @param body
-     * @param responseType
-     * @param <T>
-     * @return
-     */
     public <T> ResponseEntity<T> postForEntity(
             String url, Map<String, Object> pathVariables, String header, String body, Class<T> responseType
     ) {
