@@ -50,7 +50,7 @@ jobs:
       # gradle 실행 권한 부여
       - name: Gradle 명령 실행을 위한 권한을 부여합니다
         run: chmod +x gradlew
-1
+
       # 프로젝트 빌드 (테스트 제외)
       - name: Build with Gradle
         run: ./gradlew clean build -x test
