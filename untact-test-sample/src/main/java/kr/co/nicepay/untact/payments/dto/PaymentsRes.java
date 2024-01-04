@@ -47,7 +47,7 @@ public class PaymentsRes {
     private String buyerTel;
     private String receiptUrl;
     private boolean issuedCashReceipt;
-    private String coupon;
+    private Coupon coupon;
     private Card card;
     private Bank bank;
     private VBank vbank;

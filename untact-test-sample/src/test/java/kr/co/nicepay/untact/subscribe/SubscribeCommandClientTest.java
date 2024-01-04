@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +27,7 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
+@ActiveProfiles("prod")
 @DisplayName("정기결제 시나리오 테스트")
 @TestInstance(PER_CLASS)
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
@@ -52,20 +54,24 @@ class SubscribeCommandClientTest extends CardInfTest {
         Id<String> orderId = new Id<>(UUID.randomUUID().toString().replace("-", ""));
 
         SubscribeCreatePgReq subscribeCreatePgReq =
-                new SubscribeCreatePgReq.Builder(orderId, creditCard() /* 테스트용 카드정보 */)
-                        .returnCharSet(StandardCharsets.UTF_8.name()).build();
+                new SubscribeCreatePgReq
+                        .Builder(orderId)
+                        .encData(
+                                creditCard() /* 테스트용 카드정보 */,
+                                merchantProperties.getSecretKey())
+//                        .encMode(EncMode.A1) /* AES128(default) or AES256 */
+                        .returnCharSet(StandardCharsets.UTF_8.name())
+                        .build();
 
         // when
-        Pair<Integer, SubscribeCreatePgRes> issueResponse = subscribeCommandClient.issue(subscribeCreatePgReq);
+        SubscribeCreatePgRes issueResponse = subscribeCommandClient.issue(subscribeCreatePgReq);
 
         // then
         log.info("{}", issueResponse);
-        assertThat(issueResponse.getFirst()).isEqualTo(HttpStatus.OK.value());
-        SubscribeCreatePgRes issue = issueResponse.getSecond();
-        assertThat(issue.getResultCode()).isEqualTo("0000");
-        assertThat(issue.getBid()).isNotNull();
+        assertThat(issueResponse.getResultCode()).isEqualTo("0000");
+        assertThat(issueResponse.getBid()).isNotNull();
 
-        bid = issue.getBid();
+        bid = issueResponse.getBid();
 
         log.info("bid: {}", bid);
     }
@@ -84,17 +90,14 @@ class SubscribeCommandClientTest extends CardInfTest {
                 .build();
 
         // when
-        Pair<Integer, PaymentsRes> paymentsResponse = subscribeCommandClient.payments(bid, subscribePaymentsReq);
+        PaymentsRes paymentsResponse = subscribeCommandClient.payments(bid, subscribePaymentsReq);
 
         // then
         log.info("{}", paymentsResponse);
-        assertThat(paymentsResponse.getFirst()).isEqualTo(HttpStatus.OK.value());
-        PaymentsRes payments = paymentsResponse.getSecond();
+        assertThat(paymentsResponse.getResultCode()).isEqualTo("0000");
 
-        assertThat(payments.getResultCode()).isEqualTo("0000");
-
-        tid = payments.getTid();
-        retrieveOrderId = payments.getOrderId();
+        tid = paymentsResponse.getTid();
+        retrieveOrderId = paymentsResponse.getOrderId();
 
         log.info("tid: {}", tid);
         log.info("retrieveOrderId: {}", retrieveOrderId);
@@ -103,7 +106,7 @@ class SubscribeCommandClientTest extends CardInfTest {
     @Order(3)
     @DisplayName("승인금액검증 테스트")
     @Test
-    void checkAmountPaymentTest() throws Exception {
+    void checkAmountPaymentTest() {
         // given
         String ediDate = LocalDateTime.now().toString();
         String signData = SignDataEncrypt.encryptSHA256(tid.getValue() + amount + ediDate + merchantProperties.getSecretKey());
@@ -183,15 +186,13 @@ class SubscribeCommandClientTest extends CardInfTest {
                 .returnCharSet(StandardCharsets.UTF_8.name())
                 .build();
         // when
-        Pair<Integer, SubscribeExpireRes> expireResponse = subscribeCommandClient.expire(bid, subscribeExpireReq);
+        SubscribeExpireRes expireResponse = subscribeCommandClient.expire(bid, subscribeExpireReq);
 
         // then
         log.info("{}", expireResponse);
-        assertThat(expireResponse.getFirst()).isEqualTo(HttpStatus.OK.value());
-        SubscribeExpireRes expire = expireResponse.getSecond();
 
-        assertThat(expire.getResultCode()).isEqualTo("0000");
+        assertThat(expireResponse.getResultCode()).isEqualTo("0000");
 
-        log.info("expire: {}", expire);
+        log.info("expire: {}", expireResponse);
     }
 }

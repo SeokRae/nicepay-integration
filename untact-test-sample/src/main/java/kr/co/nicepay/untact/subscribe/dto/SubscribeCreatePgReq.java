@@ -4,7 +4,9 @@ package kr.co.nicepay.untact.subscribe.dto;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import kr.co.nicepay.untact.common.domain.Id;
+import kr.co.nicepay.untact.subscribe.domain.EncData;
 import kr.co.nicepay.untact.subscribe.domain.EncMode;
+import kr.co.nicepay.untact.subscribe.domain.EncryptStrategyFactory;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -33,11 +35,12 @@ public class SubscribeCreatePgReq {
 
     private SubscribeCreatePgReq(Builder builder) {
         this.orderId = builder.orderId;
-        this.encData = builder.encData;
         this.buyerName = builder.buyerName;
         this.buyerEmail = builder.buyerEmail;
         this.buyerTel = builder.buyerTel;
         this.encMode = builder.encMode;
+        this.encData = EncryptStrategyFactory.of(encMode)
+                .encrypt(builder.encData, builder.secretKey);
         this.ediDate = builder.ediDate;
         this.signData = builder.signData;
         this.returnCharSet = builder.returnCharSet;
@@ -47,7 +50,6 @@ public class SubscribeCreatePgReq {
 
         // Mandatory
         private final Id<String> orderId;
-        private final String encData;
 
         // Optional
         private String buyerName;
@@ -56,6 +58,9 @@ public class SubscribeCreatePgReq {
 
         // null: AES128, A2: AES256
         private EncMode encMode;
+        private String encData;
+        private String secretKey;
+
 
         // signData 사용 시 ediDate 필수
         private String ediDate;
@@ -63,9 +68,14 @@ public class SubscribeCreatePgReq {
         // default : utf-8
         private String returnCharSet;
 
-        public Builder(Id<String> orderId, String encData) {
+        public Builder(Id<String> orderId) {
             this.orderId = orderId;
-            this.encData = encData;
+        }
+
+        public Builder encData(EncData data, String secretKey) {
+            this.encData = data.getValue();
+            this.secretKey = secretKey;
+            return this;
         }
 
         public Builder buyerName(String buyerName) {
