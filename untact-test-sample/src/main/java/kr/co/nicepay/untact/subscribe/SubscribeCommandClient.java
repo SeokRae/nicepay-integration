@@ -7,7 +7,7 @@ import kr.co.nicepay.untact.common.helper.RestTemplateHelper;
 import kr.co.nicepay.untact.core.props.hosts.DomainUrlProperties;
 import kr.co.nicepay.untact.core.props.merchant.MerchantProperties;
 import kr.co.nicepay.untact.core.props.urls.SubscribeUrlProperties;
-import kr.co.nicepay.untact.payments.dto.PaymentsRes;
+import kr.co.nicepay.untact.payments.dto.PaymentsResponse;
 import kr.co.nicepay.untact.subscribe.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,35 +35,35 @@ public class SubscribeCommandClient implements SubscribeOutboundPort {
     private final JsonHelper mapper;
 
     @Override
-    public SubscribeCreatePgRes issue(final SubscribeCreatePgReq subscribeCreatePgReq) {
-        log.info("SubscribeRestTempleUseCase.issue : {}", subscribeCreatePgReq);
+    public SubscribeCreateResponse issue(final SubscribeCreateRequest subscribeCreateRequest) {
+        log.info("SubscribeRestTempleUseCase.issue : {}", subscribeCreateRequest);
         return handleRequest(() -> subscribeHttpRequest(
                 subscribeUrlProperties.getIssue(),
                 new HashMap<>(),
-                subscribeCreatePgReq,
-                SubscribeCreatePgRes.class));
+                subscribeCreateRequest,
+                SubscribeCreateResponse.class));
     }
 
     @Override
-    public PaymentsRes payments(final Id<String> bid, final SubscribePaymentsReq subscribePaymentsReq) {
+    public PaymentsResponse payments(final Id<String> bid, final SubscribePaymentsRequest subscribePaymentsRequest) {
         log.info("SubscribeRestTempleUseCase.processPayment");
         Map<String, Object> uriVariables = createUriVariables(bid);
         return handleRequest(() -> subscribeHttpRequest(
                 subscribeUrlProperties.getPayments(),
                 uriVariables,
-                subscribePaymentsReq,
-                PaymentsRes.class));
+                subscribePaymentsRequest,
+                PaymentsResponse.class));
     }
 
     @Override
-    public SubscribeExpireRes expire(final Id<String> bid, final SubscribeExpireReq subscribeExpireReq) {
+    public SubscribeExpireResponse expire(final Id<String> bid, final SubscribeExpireRequest subscribeExpireRequest) {
         log.info("SubscribeRestTempleUseCase.expire");
         Map<String, Object> uriVariables = createUriVariables(bid);
         return handleRequest(() -> subscribeHttpRequest(
                 subscribeUrlProperties.getExpire(),
                 uriVariables,
-                subscribeExpireReq,
-                SubscribeExpireRes.class));
+                subscribeExpireRequest,
+                SubscribeExpireResponse.class));
     }
 
     private Map<String, Object> createUriVariables(Id<String> bid) {

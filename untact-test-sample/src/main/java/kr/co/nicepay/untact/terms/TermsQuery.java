@@ -1,18 +1,18 @@
 package kr.co.nicepay.untact.terms;
 
 
-import kr.co.nicepay.untact.terms.dto.event.CardEventReq;
-import kr.co.nicepay.untact.terms.dto.event.CardEventRes;
-import kr.co.nicepay.untact.terms.dto.interestfree.CardInterestFeeReq;
-import kr.co.nicepay.untact.terms.dto.interestfree.CardInterestFreeRes;
-import kr.co.nicepay.untact.terms.dto.term.TermsReq;
-import kr.co.nicepay.untact.terms.dto.term.TermsRes;
+import kr.co.nicepay.untact.terms.dto.event.CardEventRequest;
+import kr.co.nicepay.untact.terms.dto.event.CardEventResponse;
+import kr.co.nicepay.untact.terms.dto.interestfree.CardInterestFeeRequest;
+import kr.co.nicepay.untact.terms.dto.interestfree.CardInterestFreeResponse;
+import kr.co.nicepay.untact.terms.dto.term.TermsRequest;
+import kr.co.nicepay.untact.terms.dto.term.TermsResponse;
 import org.springframework.data.util.Pair;
 
 public interface TermsQuery {
-    Pair<Integer, TermsRes> terms(TermsReq termsReq);
+    Pair<Integer, TermsResponse> terms(TermsRequest termsRequest);
 
-    Pair<Integer, CardEventRes> cardEvent(CardEventReq cardEventReq);
+    Pair<Integer, CardEventResponse> cardEvent(CardEventRequest cardEventRequest);
 
-    Pair<Integer, CardInterestFreeRes> cardInterestFree(CardInterestFeeReq cardInterestFeeReq);
+    Pair<Integer, CardInterestFreeResponse> cardInterestFree(CardInterestFeeRequest cardInterestFeeRequest);
 }

@@ -1,15 +1,15 @@
 package kr.co.nicepay.untact.subscribe;
 
-import kr.co.nicepay.untact.checkamt.CheckAmountQueryClient;
-import kr.co.nicepay.untact.checkamt.dto.CheckAmountReq;
-import kr.co.nicepay.untact.checkamt.dto.CheckAmountRes;
+import kr.co.nicepay.untact.checkamt.CheckAmountQueryRestClient;
+import kr.co.nicepay.untact.checkamt.dto.CheckAmountRequest;
+import kr.co.nicepay.untact.checkamt.dto.CheckAmountResponse;
 import kr.co.nicepay.untact.common.domain.Id;
 import kr.co.nicepay.untact.common.utils.SignDataEncrypt;
 import kr.co.nicepay.untact.core.CardInfTest;
-import kr.co.nicepay.untact.payments.PaymentsCommandClient;
-import kr.co.nicepay.untact.payments.PaymentsQueryClient;
-import kr.co.nicepay.untact.payments.dto.PaymentsCancelReq;
-import kr.co.nicepay.untact.payments.dto.PaymentsRes;
+import kr.co.nicepay.untact.payments.PaymentsCommandRestClient;
+import kr.co.nicepay.untact.payments.PaymentsQueryRestClient;
+import kr.co.nicepay.untact.payments.dto.PaymentsCancelRequest;
+import kr.co.nicepay.untact.payments.dto.PaymentsResponse;
 import kr.co.nicepay.untact.subscribe.dto.*;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
@@ -40,11 +40,11 @@ class SubscribeCommandClientTest extends CardInfTest {
     @Autowired
     private SubscribeCommandClient subscribeCommandClient;
     @Autowired
-    private CheckAmountQueryClient checkAmountQueryClient;
+    private CheckAmountQueryRestClient checkAmountQueryRestClient;
     @Autowired
-    private PaymentsQueryClient paymentsQueryClient;
+    private PaymentsQueryRestClient paymentsQueryRestClient;
     @Autowired
-    private PaymentsCommandClient paymentsCommandClient;
+    private PaymentsCommandRestClient paymentsCommandRestClient;
 
     @Order(1)
     @DisplayName("정기결제 빌키발급 테스트")
@@ -53,8 +53,8 @@ class SubscribeCommandClientTest extends CardInfTest {
         // given
         Id<String> orderId = new Id<>(UUID.randomUUID().toString().replace("-", ""));
 
-        SubscribeCreatePgReq subscribeCreatePgReq =
-                new SubscribeCreatePgReq
+        SubscribeCreateRequest subscribeCreateRequest =
+                new SubscribeCreateRequest
                         .Builder(orderId)
                         .encData(
                                 creditCard() /* 테스트용 카드정보 */,
@@ -64,7 +64,7 @@ class SubscribeCommandClientTest extends CardInfTest {
                         .build();
 
         // when
-        SubscribeCreatePgRes issueResponse = subscribeCommandClient.issue(subscribeCreatePgReq);
+        SubscribeCreateResponse issueResponse = subscribeCommandClient.issue(subscribeCreateRequest);
 
         // then
         log.info("{}", issueResponse);
@@ -83,14 +83,14 @@ class SubscribeCommandClientTest extends CardInfTest {
         // given
         Id<String> orderId = new Id<>(UUID.randomUUID().toString().replace("-", ""));
 
-        SubscribePaymentsReq subscribePaymentsReq = SubscribePaymentsReq.builder()
+        SubscribePaymentsRequest subscribePaymentsRequest = SubscribePaymentsRequest.builder()
                 .orderId(orderId)
                 .amount(amount)
                 .goodsName("정기결제 테스트")
                 .build();
 
         // when
-        PaymentsRes paymentsResponse = subscribeCommandClient.payments(bid, subscribePaymentsReq);
+        PaymentsResponse paymentsResponse = subscribeCommandClient.payments(bid, subscribePaymentsRequest);
 
         // then
         log.info("{}", paymentsResponse);
@@ -111,19 +111,19 @@ class SubscribeCommandClientTest extends CardInfTest {
         String ediDate = LocalDateTime.now().toString();
         String signData = SignDataEncrypt.encryptSHA256(tid.getValue() + amount + ediDate + merchantProperties.getSecretKey());
 
-        CheckAmountReq checkAmountReq = CheckAmountReq.builder()
+        CheckAmountRequest checkAmountRequest = CheckAmountRequest.builder()
                 .amount(amount)
                 .ediDate(ediDate)
                 .signData(signData)
                 .build();
 
         // when
-        Pair<Integer, CheckAmountRes> checkAmountResponse = checkAmountQueryClient.checkAmount(tid, checkAmountReq);
+        Pair<Integer, CheckAmountResponse> checkAmountResponse = checkAmountQueryRestClient.checkAmount(tid, checkAmountRequest);
 
         // then
         log.info("{}", checkAmountResponse);
         assertThat(checkAmountResponse.getFirst()).isEqualTo(HttpStatus.OK.value());
-        CheckAmountRes checkAmt = checkAmountResponse.getSecond();
+        CheckAmountResponse checkAmt = checkAmountResponse.getSecond();
 
         assertThat(checkAmt.getResultCode()).isEqualTo("0000");
 
@@ -137,16 +137,16 @@ class SubscribeCommandClientTest extends CardInfTest {
         // given
 
         // when
-        Pair<Integer, PaymentsRes> retrieveTransactionOrderId = paymentsQueryClient.retrieveOrderId(retrieveOrderId);
+        Pair<Integer, PaymentsResponse> retrieveTransactionOrderId = paymentsQueryRestClient.retrieveOrderId(retrieveOrderId);
 
         // then
         log.info("{}", retrieveTransactionOrderId);
         assertThat(retrieveTransactionOrderId.getFirst()).isEqualTo(HttpStatus.OK.value());
-        PaymentsRes paymentsRes = retrieveTransactionOrderId.getSecond();
+        PaymentsResponse paymentsResponse = retrieveTransactionOrderId.getSecond();
 
-        assertThat(paymentsRes.getResultCode()).isEqualTo("0000");
+        assertThat(paymentsResponse.getResultCode()).isEqualTo("0000");
 
-        log.info("paymentsRes: {}", paymentsRes);
+        log.info("paymentsRes: {}", paymentsResponse);
     }
 
     @Order(5)
@@ -156,22 +156,22 @@ class SubscribeCommandClientTest extends CardInfTest {
         // given
         Id<String> orderId = new Id<>(UUID.randomUUID().toString().replace("-", ""));
 
-        PaymentsCancelReq paymentsCancelReq = PaymentsCancelReq.builder()
+        PaymentsCancelRequest paymentsCancelRequest = PaymentsCancelRequest.builder()
                 .orderId(orderId)
                 .reason("빌키 승인 건 삭제 테스트")
                 .build();
 
         // when
-        Pair<Integer, PaymentsRes> cancelledResposne = paymentsCommandClient.cancel(tid, paymentsCancelReq);
+        Pair<Integer, PaymentsResponse> cancelledResposne = paymentsCommandRestClient.cancel(tid, paymentsCancelRequest);
 
         // then
         log.info("{}", cancelledResposne);
         assertThat(cancelledResposne.getFirst()).isEqualTo(HttpStatus.OK.value());
-        PaymentsRes paymentsRes = cancelledResposne.getSecond();
+        PaymentsResponse paymentsResponse = cancelledResposne.getSecond();
 
-        assertThat(paymentsRes.getResultCode()).isEqualTo("0000");
+        assertThat(paymentsResponse.getResultCode()).isEqualTo("0000");
 
-        log.info("paymentsRes: {}", paymentsRes);
+        log.info("paymentsRes: {}", paymentsResponse);
     }
 
     @Order(6)
@@ -181,12 +181,12 @@ class SubscribeCommandClientTest extends CardInfTest {
         // given
         Id<String> orderId = new Id<>(UUID.randomUUID().toString().replace("-", ""));
 
-        SubscribeExpireReq subscribeExpireReq = SubscribeExpireReq.builder()
+        SubscribeExpireRequest subscribeExpireRequest = SubscribeExpireRequest.builder()
                 .orderId(orderId)
                 .returnCharSet(StandardCharsets.UTF_8.name())
                 .build();
         // when
-        SubscribeExpireRes expireResponse = subscribeCommandClient.expire(bid, subscribeExpireReq);
+        SubscribeExpireResponse expireResponse = subscribeCommandClient.expire(bid, subscribeExpireRequest);
 
         // then
         log.info("{}", expireResponse);
