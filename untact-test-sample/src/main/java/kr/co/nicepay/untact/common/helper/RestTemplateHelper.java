@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -74,53 +75,17 @@ public class RestTemplateHelper {
         return restTemplate.exchange(builder.toUriString(), HttpMethod.POST, requestEntity, responseType);
     }
 
-    /**
-     * @param url
-     * @param pathVariables
-     * @param header
-     * @param responseType
-     * @param <T>
-     * @return
-     */
-    public <T> ResponseEntity<T> get(
-            String url, String header, Class<T> responseType
-    ) {
-        HttpHeaders headers = setHeaders(header);
-
-        UriComponents builder = UriComponentsBuilder.fromUriString(url).build();
-
-        HttpEntity<Object> requestEntity = new HttpEntity<>(headers);
-
-        log.info("url: {}, header: {}", builder.toUriString(), header);
-        return restTemplate.exchange(builder.toUriString(), HttpMethod.GET, requestEntity, responseType);
-    }
-
     public <T> ResponseEntity<T> getParamsRestTemplate(
-            String url, String header, Map<String, Object> params, Class<T> responseType
+      String url, String header, MultiValueMap<String, Object> params, Class<T> responseType
     ) {
         HttpHeaders headers = setHeaders(header);
-
-        HttpEntity<String> request = new HttpEntity<>(headers);
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
 
-        if (params != null) {
-            for (Map.Entry<String, Object> entry : params.entrySet()) {
-                builder.queryParam(entry.getKey(), entry.getValue());
-            }
-        }
         log.info("url: {}, header: {}", builder.toUriString(), header);
-        return restTemplate.exchange(builder.toUriString(), HttpMethod.GET, request, responseType);
+        return restTemplate.exchange(builder.toUriString(), HttpMethod.GET, new HttpEntity<>(params, headers), responseType);
     }
 
-    /**
-     * @param url
-     * @param pathVariables
-     * @param header
-     * @param responseType
-     * @param <T>
-     * @return
-     */
     public <T> ResponseEntity<T> getForEntity(
             String url, Map<String, String> pathVariables, String header, Class<T> responseType
     ) {
