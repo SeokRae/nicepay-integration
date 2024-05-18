@@ -13,9 +13,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TermsRequest {
 
-  private TermsType termsType;
-
-  private String returnCharSet;
+  private final TermsType termsType;
+  private final String returnCharSet;
 
   public MultiValueMap<String, Object> toMultiValueMap() {
     MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();

@@ -80,10 +80,24 @@ public class RestTemplateHelper {
     ) {
         HttpHeaders headers = setHeaders(header);
 
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
+        HttpEntity<String> request = new HttpEntity<>(headers);
 
-        log.info("url: {}, header: {}", builder.toUriString(), header);
-        return restTemplate.exchange(builder.toUriString(), HttpMethod.GET, new HttpEntity<>(params, headers), responseType);
+        String fullUrl = buildUrlWithParams(url, params);
+
+        log.info("url: {}, header: {}", fullUrl, header);
+        return restTemplate.exchange(fullUrl, HttpMethod.GET, request, responseType);
+    }
+
+    private String buildUrlWithParams(String url, MultiValueMap<String, Object> queryParams) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
+        if (queryParams != null) {
+            for (Map.Entry<String, java.util.List<Object>> entry : queryParams.entrySet()) {
+                for (Object value : entry.getValue()) {
+                    builder.queryParam(entry.getKey(), value);
+                }
+            }
+        }
+        return builder.toUriString();
     }
 
     public <T> ResponseEntity<T> getForEntity(
